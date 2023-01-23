@@ -62,6 +62,7 @@ func BuildRouter(c *services.Container) {
 	// Example routes
 	navRoutes(c, g, ctr)
 	userRoutes(c, g, ctr)
+	tramiteRoutes(c, g, ctr)
 }
 
 func navRoutes(c *services.Container, g *echo.Group, ctr controller.Controller) {
@@ -106,4 +107,10 @@ func userRoutes(c *services.Container, g *echo.Group, ctr controller.Controller)
 	reset := resetPassword{Controller: ctr}
 	resetGroup.GET("/token/:user/:password_token/:token", reset.Get).Name = "reset_password"
 	resetGroup.POST("/token/:user/:password_token/:token", reset.Post).Name = "reset_password.post"
+}
+
+func tramiteRoutes(c *services.Container, g *echo.Group, ctr controller.Controller) {
+	loadPdf := loadPdf{Controller: ctr}
+	g.GET("/test", loadPdf.Get).Name = "tramite.get"
+	g.POST("/test", loadPdf.Post).Name = "tramite.post"
 }

@@ -1,0 +1,7 @@
+{{define "content"}}
+<form method="POST" enctype='multipart/form-data' action="{{call .ToURL "tramite.post"}}">
+    <input type="file" name="pdf">
+    <input value="Cargar" type="submit">
+    {{template "csrf" .}}
+</form>
+{{end}}
