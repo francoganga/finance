@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"github.com/francoganga/pagoda_bun/pkg/internal/lexer"
 	"strconv"
-	"strings"
-
-	"github.com/ztrue/tracerr"
 )
 
 type Parser struct {
@@ -51,15 +48,6 @@ func (p *Parser) expectPeek(t lexer.TokenType) bool {
 	}
 }
 
-func (p *Parser) expectPeek2(t lexer.TokenType) bool {
-	if p.peekTokenIs(t) {
-		p.nextToken()
-		return true
-	} else {
-		return false
-	}
-}
-
 func (p *Parser) peekTokenIs(t lexer.TokenType) bool {
 	return p.peekToken.Type == t
 }
@@ -74,47 +62,46 @@ func (p *Parser) peekError(t lexer.TokenType) {
 	p.errors = append(p.errors, msg)
 }
 
-func (p *Parser) parseDate() (string, error) {
+func (p *Parser) parseDate() string {
 
 	time_str := p.curToken.Literal
 
-	if !p.expectPeek2(lexer.SLASH) {
-		return "", tracerr.Errorf("expected next token to be %s, got %s instead", lexer.SLASH, p.peekToken.Type)
+	if !p.expectPeek(lexer.SLASH) {
+		return ""
 	}
 
 	time_str += p.curToken.Literal
 
-	if !p.expectPeek2(lexer.INT) {
-		return "", tracerr.Errorf("expected next token to be %s, got %s instead", lexer.INT, p.peekToken.Type)
+	if !p.expectPeek(lexer.INT) {
+		return ""
 	}
 
 	time_str += p.curToken.Literal
 
-	if !p.expectPeek2(lexer.SLASH) {
-		return "", tracerr.Errorf("expected next token to be %s, got %s instead", lexer.SLASH, p.peekToken.Type)
+	if !p.expectPeek(lexer.SLASH) {
+		return ""
 	}
 
 	time_str += p.curToken.Literal
 
-	if !p.expectPeek2(lexer.INT) {
-		return "", tracerr.Errorf("expected next token to be %s, got %s instead", lexer.INT, p.peekToken.Type)
+	if !p.expectPeek(lexer.INT) {
+		return ""
 	}
 
 	time_str += p.curToken.Literal
 
-	return time_str, nil
+	return time_str
 }
 
 type ConsumoDto struct {
-	Date        string `json:"date"`
-	Code        string `json:"code"`
-	Description string `json:"description"`
-	Amount      int    `json:"amount"`
-	Balance     int    `json:"balance"`
+	Date        string
+	Code        string
+	Description string
+	Amount      int
+	Balance     int
 }
 
-// TODO refactor removing dots and commas for simplicity
-func (p *Parser) parseAmount() (int, error) {
+func (p *Parser) parseAmount() int {
 
 	str_code := ""
 
@@ -127,8 +114,8 @@ func (p *Parser) parseAmount() (int, error) {
 		p.nextToken()
 	}
 
-	if !p.expectPeek2(lexer.INT) {
-		return 0, tracerr.Errorf("expected next token to be=%s, got=%s", lexer.INT, p.peekToken.Type)
+	if !p.expectPeek(lexer.INT) {
+		return 0
 	}
 
 	str_code += p.curToken.Literal
@@ -137,7 +124,7 @@ func (p *Parser) parseAmount() (int, error) {
 		p.nextToken()
 
 		if !p.expectPeek(lexer.INT) {
-			return 0, tracerr.Errorf("expected next token to be=%s, got=%s", lexer.INT, p.peekToken.Type)
+			return 0
 		}
 
 		str_code += p.curToken.Literal
@@ -146,21 +133,21 @@ func (p *Parser) parseAmount() (int, error) {
 	amount, err := strconv.Atoi(str_code)
 
 	if err != nil {
-		return 0, tracerr.Errorf("Could not parse string=%s to int", str_code)
+		return 0
 	}
 
 	amount = amount * 100
 
 	if p.peekTokenIs(lexer.COMMA) {
 		p.nextToken()
-		if !p.expectPeek2(lexer.INT) {
-			return 0, tracerr.Errorf("expected next token to be=%s, got=%s", lexer.INT, p.peekToken.Type)
+		if !p.expectPeek(lexer.INT) {
+			return 0
 		}
 
 		decimal, err := strconv.Atoi(p.curToken.Literal)
 
 		if err != nil {
-			return 0, tracerr.Errorf("Could not parse string=%s to int", p.curToken.Literal)
+			return 0
 		}
 
 		if amount < 0 {
@@ -171,117 +158,36 @@ func (p *Parser) parseAmount() (int, error) {
 
 	}
 
-	return amount, nil
+	return amount
 }
 
-func (p *Parser) parseDescription() (string, error) {
-
-	desc := ""
-
-	for p.curToken.Type != lexer.SEP && p.curToken.Type != lexer.EOF {
-		fmt.Printf("%+v != lexer.SEP && %+v != lexer.EOF \n", p.curToken.Type, p.curToken.Type)
-		fmt.Printf("curToek=%v\n", p.curToken)
-
-		fmt.Printf("nextToken=%v\n", p.peekToken)
-
-		desc += p.curToken.Literal + " "
-
-		fmt.Println("after concat??")
-		p.nextToken()
-
-		fmt.Println("hace el nextToken????")
-	}
-
-	fmt.Println("after for")
-
-	return strings.TrimRight(desc, " "), nil
-}
-
-func (p *Parser) ParseConsumo() (*ConsumoDto, error) {
+func (p *Parser) ParseConsumo() *ConsumoDto {
 	c := &ConsumoDto{}
 
-	date, err := p.parseDate()
-
-	if err != nil {
-		return &ConsumoDto{}, err
-	}
-
-	fmt.Println("after date parse")
+	date := p.parseDate()
 
 	c.Date = date
 
-	if !p.expectPeek2(lexer.SEP) {
-		return &ConsumoDto{}, tracerr.Errorf("expected next token to be %s, got %s instead", lexer.SEP, p.peekToken.Type)
+	if !p.expectPeek(lexer.INT) {
+		return nil
 	}
-
-	p.nextToken()
 
 	c.Code = p.curToken.Literal
 
-	fmt.Println("after code")
-
-	if !p.expectPeek2(lexer.SEP) {
-		return &ConsumoDto{}, tracerr.Errorf("expected next token to be %s, got %s instead", lexer.SEP, p.peekToken.Type)
+	if !p.expectPeek(lexer.DESC) {
+		return nil
 	}
 
-	p.nextToken()
+	c.Description = p.curToken.Literal
 
-	desc, err := p.parseDescription()
+	c.Amount = p.parseAmount()
 
-	if err != nil {
-		return &ConsumoDto{}, err
+	c.Balance = p.parseAmount()
+
+	if p.peekTokenIs(lexer.DESC) {
+		p.nextToken()
+		c.Description += ": " + p.curToken.Literal
 	}
 
-	fmt.Println("after desc1")
-
-	c.Description = desc
-
-	a, err := p.parseAmount()
-
-	if err != nil {
-		return &ConsumoDto{}, err
-	}
-
-	fmt.Println("after amount")
-
-	c.Amount = a
-
-	if !p.expectPeek2(lexer.SEP) {
-		return &ConsumoDto{}, tracerr.Errorf("expected next token to be %s, got %s instead", lexer.SEP, p.peekToken.Type)
-	}
-
-	p.nextToken()
-
-	b, err := p.parseAmount()
-
-	if err != nil {
-		return &ConsumoDto{}, err
-	}
-
-	fmt.Println("after balance")
-
-	c.Balance = b
-
-	if !p.expectPeek2(lexer.SEP) {
-		return &ConsumoDto{}, tracerr.Errorf("expected next token to be %s, got %s instead", lexer.SEP, p.peekToken.Type)
-	}
-
-	p.nextToken()
-
-	desc2, err := p.parseDescription()
-
-	if err != nil {
-		return &ConsumoDto{}, tracerr.Errorf("expected next token to be %s, got %s instead", lexer.SEP, p.peekToken.Type)
-	}
-
-	fmt.Println("after desc2")
-
-	c.Description += ": " + desc2
-
-	// if p.peekTokenIs(lexer.DESC) {
-	// 	p.nextToken()
-	// 	c.Description += ": " + p.curToken.Literal
-	// }
-
-	return c, nil
+	return c
 }

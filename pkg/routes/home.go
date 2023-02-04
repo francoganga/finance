@@ -3,6 +3,7 @@ package routes
 import (
 	"fmt"
 
+	"github.com/francoganga/pagoda_bun/models"
 	"github.com/francoganga/pagoda_bun/pkg/controller"
 
 	"github.com/labstack/echo/v4"
@@ -25,8 +26,20 @@ func (c *home) Get(ctx echo.Context) error {
 	page.Name = "home"
 	page.Metatags.Description = "Welcome to the homepage."
 	page.Metatags.Keywords = []string{"Go", "MVC", "Web", "Software"}
-	page.Pager = controller.NewPager(ctx, 4)
-	page.Data = c.fetchPosts(&page.Pager)
+	page.Pager = controller.NewPager(ctx, 10)
+
+	transactions := make([]*models.Transaction, 0)
+
+	err := c.Container.Bun.NewSelect().
+		Model(&transactions).
+		Scan(ctx.Request().Context())
+
+	if err != nil {
+		return err
+	}
+	page.Pager.SetItems(len(transactions))
+
+	page.Data = transactions[page.Pager.GetOffset() : page.Pager.GetOffset()+page.Pager.ItemsPerPage]
 
 	return c.RenderPage(ctx, page)
 }

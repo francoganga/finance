@@ -32,7 +32,7 @@ cache:
 
 database:
   hostname: "localhost"
-  port: 5432
+  port: 5434
   user: "admin"
   password: "admin"
   database: "app"

@@ -1,5 +1,7 @@
 package lexer
 
+import "fmt"
+
 type Lexer struct {
 	input        string
 	position     int
@@ -19,11 +21,9 @@ const (
 	SLASH  = "SLASH"
 	DOLLAR = "DOLLAR"
 	MINUS  = "MINUS"
+	DESC   = "DESC"
 	COMMA  = "COMMA"
 	DOT    = "DOT"
-	WORD   = "WORD"
-	STAR   = "*"
-	SEP    = "SEP"
 	EOF    = "EOF"
 )
 
@@ -36,16 +36,6 @@ func New(input string) *Lexer {
 
 func (l *Lexer) NextToken() Token {
 	var tok Token
-
-	if l.hasMoreThanOneSpace() {
-		l.skipWhitespace()
-		return newToken(SEP, byte('_'))
-	}
-
-	if l.hasNewLine() {
-		l.skipWhitespace()
-		return newToken(SEP, byte('_'))
-	}
 
 	l.skipWhitespace()
 
@@ -60,8 +50,6 @@ func (l *Lexer) NextToken() Token {
 		tok = newToken(COMMA, l.ch)
 	case '.':
 		tok = newToken(DOT, l.ch)
-	case '*':
-		tok = newToken(STAR, l.ch)
 
 	case 0:
 		tok.Literal = ""
@@ -74,8 +62,8 @@ func (l *Lexer) NextToken() Token {
 			tok.Literal = l.readNumber()
 			return tok
 		} else if isLetter(l.ch) {
-			tok.Type = WORD
-			tok.Literal = l.readWord()
+			tok.Type = DESC
+			tok.Literal = l.readSentence()
 		}
 	}
 
@@ -105,45 +93,12 @@ func (l *Lexer) skipWhitespace() {
 	}
 }
 
-func (l *Lexer) hasMoreThanOneSpace() bool {
-	if l.readPosition >= len(l.input) {
-		return false
-	}
-
-	if l.position >= len(l.input) {
-		return false
-	}
-
-	return l.input[l.position] == ' ' && l.input[l.readPosition] == ' '
-}
-
-func (l *Lexer) hasNewLine() bool {
-	if l.position >= len(l.input) {
-		return false
-	}
-
-	return l.input[l.position] == '\n'
-}
-
 func isLetter(ch byte) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
 }
 
 func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
-}
-
-func isSymbol(ch byte) bool {
-
-	if ch == 0 {
-		return false
-	}
-
-	if ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' {
-		return false
-	}
-
-	return 0 <= ch && ch <= 127
 }
 
 func (l *Lexer) readNumber() string {
@@ -184,12 +139,24 @@ func (l *Lexer) peekTill(till byte, fun func(ch byte) bool) bool {
 	return false
 }
 
-func (l *Lexer) readWord() string {
+func (l *Lexer) readSentence() string {
 	position := l.position
 
-	for isSymbol(l.ch) {
+	for isLetter(l.ch) || l.ch == ' ' || isDigit(l.ch) {
 		l.readChar()
+		if l.ch == ' ' && l.peekChar() == ' ' {
+			break
+		}
+
+		if !isLetter(l.peekChar()) && l.peekChar() != ' ' && l.peekChar() != 0 {
+			l.readChar()
+			if l.position < len(l.input) {
+				l.readChar()
+			}
+		}
 	}
+
+	fmt.Printf("start:=%d, end=%d\n", position, l.position)
 
 	return l.input[position:l.position]
 }

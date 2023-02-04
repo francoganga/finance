@@ -32,24 +32,28 @@
 
 {{define "posts"}}
     <div id="posts">
-        {{- range .Data}}
-            <article class="media">
-                <figure class="media-left">
-                    <p class="image is-64x64">
-                        <img src="{{file "gopher.png"}}" alt="Gopher"/>
-                    </p>
-                </figure>
-                <div class="media-content">
-                    <div class="content">
-                        <p>
-                            <strong>{{.Title}}</strong>
-                            <br>
-                            {{.Body}}
-                        </p>
-                    </div>
-                </div>
-            </article>
-        {{- end}}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Code</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+            {{- range .Data}}
+                <tr>
+                    <td>{{.Date.Format "2006-02-01"}}</td>
+                    <td>{{.Code }}</td>
+                    <td>{{.Description}}</td>
+                    <td>{{.Amount}}</td>
+                    <td>{{.Balance}}</td>
+                </tr>
+            {{- end}}
+            </tbody>
+        </table>
 
         <div class="field is-grouped is-grouped-centered">
             {{- if not $.Pager.IsBeginning}}

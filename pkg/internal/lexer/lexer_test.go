@@ -19,33 +19,20 @@ func TestNextToken(t *testing.T) {
 		{INT, "07"},
 		{SLASH, "/"},
 		{INT, "21"},
-		{SEP, "_"},
 		{INT, "10280171"},
-		{SEP, "_"},
-		{WORD, "Compra"},
-		{WORD, "con"},
-		{WORD, "tarjeta"},
-		{WORD, "de"},
-		{WORD, "debito"},
-		{SEP, "_"},
+		{DESC, "Compra con tarjeta de debito"},
 		{MINUS, "-"},
 		{DOLLAR, "$"},
 		{INT, "650"},
 		{COMMA, ","},
 		{INT, "00"},
-		{SEP, "_"},
 		{DOLLAR, "$"},
 		{INT, "104"},
 		{DOT, "."},
 		{INT, "095"},
 		{COMMA, ","},
 		{INT, "74"},
-		{SEP, "_"},
-		{WORD, "Mercadopago*recargatuenti"},
-		{MINUS, "-"},
-		{WORD, "tarj"},
-		{WORD, "nro."},
-		{INT, "1866"},
+		{DESC, "Mercadopago*recargatuenti - tarj nro. 1866"},
 		{EOF, ""},
 	}
 
@@ -67,17 +54,6 @@ func TestNextToken(t *testing.T) {
 
 }
 
-// func TestPeekTill(t *testing.T) {
-// 	input := "algo9 8888a sss 99999"
-//
-// 	l := New(input)
-//
-// 	l.peekTill(' ', func(ch byte) bool {
-//
-// 	})
-//
-// }
-
 // func TestReadSentence(t *testing.T) {
 //
 // 	input := `05/07/21               Compra con tarjeta de debito                               -$ 650,00                                $ 104.095,74
@@ -93,3 +69,7 @@ func TestNextToken(t *testing.T) {
 // 	}
 //
 // }
+	
+
+	
+
