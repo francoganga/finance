@@ -101,6 +101,13 @@ func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
 }
 
+// Reads N chars
+func (l *Lexer) readNChar(n int) {
+	for i := 1; i <= n; i++ {
+		l.readChar()
+	}
+
+}
 func (l *Lexer) readNumber() string {
 	position := l.position
 	for isDigit(l.ch) {
@@ -115,7 +122,16 @@ func (l *Lexer) peekChar() byte {
 	} else {
 		return l.input[l.readPosition]
 	}
+}
 
+// Peeks char with offset from readPosition
+func (l *Lexer) peekCharAt(offset int) byte {
+
+	if l.position+offset >= len(l.input) {
+		return 0
+	}
+
+	return l.input[l.position+offset]
 }
 
 func (l *Lexer) peekTill(till byte, fun func(ch byte) bool) bool {
