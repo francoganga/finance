@@ -54,24 +54,7 @@ func TestNextToken(t *testing.T) {
 
 }
 
-// func TestReadSentence(t *testing.T) {
-//
-// 	input := `05/07/21               Compra con tarjeta de debito                               -$ 650,00                                $ 104.095,74
-//     Mercadopago*recargatuenti - tarj nro. 1866`
-//
-// 	l := New(input)
-//
-// 	tok := l.NextToken()
-//
-// 	fmt.Printf("tok=%v\n", tok)
-// 	if tok.Type != DATE {
-// 		t.Fatalf("tokentype wrong. expected=%q, got=%q", DATE, tok.Type)
-// 	}
-//
-// }
-	
-
-	
+func TestSinComprobante(t *testing.T) {
 
 	input := `07/02/23                              Pago interes por saldo en cuenta                                        $ 5,90                              $ 631.288,84
                                       Del 01/01/23 al 31/01/23`
