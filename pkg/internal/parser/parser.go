@@ -10,6 +10,7 @@ type Parser struct {
 	l *lexer.Lexer
 
 	errors []string
+	buffer []lexer.Token
 
 	curToken  lexer.Token
 	peekToken lexer.Token
@@ -32,6 +33,7 @@ func New(l *lexer.Lexer) *Parser {
 func (p *Parser) nextToken() {
 	p.curToken = p.peekToken
 	p.peekToken = p.l.NextToken()
+	p.buffer = append(p.buffer, p.peekToken)
 }
 
 func (p *Parser) Errors() []string {
@@ -57,8 +59,14 @@ func (p *Parser) curTokenIs(t lexer.TokenType) bool {
 }
 
 func (p *Parser) peekError(t lexer.TokenType) {
-	msg := fmt.Sprintf("expected next token to be %s, got %s instead",
-		t, p.peekToken.Type)
+	context := ""
+
+	for _, m := range p.buffer {
+		context += m.Literal + " "
+	}
+
+	msg := fmt.Sprintf("expected next token to be %s, got %s instead. ON: %s\n",
+		t, p.peekToken.Type, context)
 	p.errors = append(p.errors, msg)
 }
 
@@ -168,11 +176,10 @@ func (p *Parser) ParseConsumo() *ConsumoDto {
 
 	c.Date = date
 
-	if !p.expectPeek(lexer.INT) {
-		return nil
+	if p.peekTokenIs(lexer.INT) {
+		p.nextToken()
+		c.Code = p.curToken.Literal
 	}
-
-	c.Code = p.curToken.Literal
 
 	if !p.expectPeek(lexer.DESC) {
 		return nil
