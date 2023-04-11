@@ -1,6 +1,6 @@
 package lexer
 
-import "fmt"
+import "errors"
 
 type Lexer struct {
 	input        string
@@ -25,6 +25,7 @@ const (
 	COMMA  = "COMMA"
 	DOT    = "DOT"
 	EOF    = "EOF"
+	USD    = "USD"
 )
 
 func New(input string) *Lexer {
@@ -38,6 +39,15 @@ func (l *Lexer) NextToken() Token {
 	var tok Token
 
 	l.skipWhitespace()
+
+	if l.ch == 'U' {
+		err, lit := l.maybeReadUSD()
+
+		if err == nil {
+			tok.Type = USD
+			tok.Literal = lit
+		}
+	}
 
 	switch l.ch {
 	case '-':
@@ -108,6 +118,17 @@ func (l *Lexer) readNChar(n int) {
 	}
 
 }
+
+func (l *Lexer) maybeReadUSD() (error, string) {
+	if l.ch == 'U' && l.peekCharAt(1) == '$' && l.peekCharAt(2) == 'S' {
+		l.readNChar(3)
+
+		return nil, "U$S"
+	}
+
+	return errors.New("Could not read USD token"), ""
+}
+
 func (l *Lexer) readNumber() string {
 	position := l.position
 	for isDigit(l.ch) {
@@ -172,7 +193,7 @@ func (l *Lexer) readSentence() string {
 		}
 	}
 
-	fmt.Printf("start:=%d, end=%d\n", position, l.position)
+	// fmt.Printf("start:=%d, end=%d\n", position, l.position)
 
 	return l.input[position:l.position]
 }
