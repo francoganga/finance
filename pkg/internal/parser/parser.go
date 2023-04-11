@@ -118,6 +118,13 @@ func (p *Parser) parseAmount() int {
 		str_code += p.curToken.Literal
 	}
 
+	// TODO: For now ignore USD token
+	// Maybe i would want to handle the different currencies in the backend
+	// Investigate how to store different currencies in db
+	if p.peekTokenIs(lexer.USD) {
+		p.nextToken()
+	}
+
 	if p.peekTokenIs(lexer.DOLLAR) {
 		p.nextToken()
 	}

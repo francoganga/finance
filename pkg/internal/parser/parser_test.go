@@ -153,6 +153,37 @@ func TestParseConsumoUSD(t *testing.T) {
 	fmt.Printf("c=%v\n", c)
 }
 
+// TODO: Maybe refactor
+// parseAmount starts by doing nexToken so for testing purposes
+// i need to have a token before the amount
+func TestParseAmountUSD(t *testing.T) {
+	input := "9 -U$S 3,49"
+
+	p := FromInput(input)
+
+	amount := p.parseAmount()
+
+	checkParserErrors(t, p)
+
+	fmt.Printf("amount=%v\n", amount)
+}
+
+func TestParseAmountNegative(t *testing.T) {
+	input := "9 -$ 3,49"
+
+	p := FromInput(input)
+
+	amount := p.parseAmount()
+
+	checkParserErrors(t, p)
+
+	if amount != -349 {
+		t.Fatalf("expected amount to be %d, got=%d", -349, amount)
+	}
+
+	fmt.Printf("amount=%v\n", amount)
+}
+
 func checkParserErrors(t *testing.T, p *Parser) {
 	errors := p.Errors()
 
