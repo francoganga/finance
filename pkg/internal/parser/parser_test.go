@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"github.com/francoganga/pagoda_bun/pkg/internal/lexer"
 	"testing"
-
-	"github.com/ztrue/tracerr"
 )
 
 func TestParseDate(t *testing.T) {
@@ -18,11 +16,7 @@ func TestParseDate(t *testing.T) {
 
 	p := New(l)
 
-	d, err := p.parseDate()
-
-	if err != nil {
-		tracerr.PrintSourceColor(err)
-	}
+	d := p.parseDate()
 
 	checkParserErrors(t, p)
 
@@ -40,11 +34,7 @@ func TestParseAmount(t *testing.T) {
 
 	p := New(l)
 
-	a, err := p.parseAmount()
-
-	if err != nil {
-		tracerr.PrintSourceColor(err)
-	}
+	a := p.parseAmount()
 
 	checkParserErrors(t, p)
 
@@ -63,12 +53,8 @@ func TestParseConsumo(t *testing.T) {
 
 	p := New(l)
 
-	c, err := p.ParseConsumo()
+	c := p.ParseConsumo()
 
-	if err != nil {
-		tracerr.PrintSourceColor(err)
-		t.FailNow()
-	}
 	checkParserErrors(t, p)
 
 	if c.Date != "05/07/21" {
@@ -102,12 +88,8 @@ func TestParseConsumo2(t *testing.T) {
 
 	p := New(l)
 
-	c, err := p.ParseConsumo()
+	c := p.ParseConsumo()
 
-	if err != nil {
-		tracerr.PrintSourceColor(err)
-		t.FailNow()
-	}
 	checkParserErrors(t, p)
 
 	fmt.Printf("c=%v\n", c)
@@ -122,12 +104,8 @@ func TestParseConsumo3(t *testing.T) {
 
 	p := New(l)
 
-	c, err := p.ParseConsumo()
+	c := p.ParseConsumo()
 
-	if err != nil {
-		tracerr.PrintSourceColor(err)
-		t.FailNow()
-	}
 	checkParserErrors(t, p)
 
 	fmt.Printf("c=%v\n", c)
@@ -140,12 +118,36 @@ func TestParseConsumo4(t *testing.T) {
 
 	p := FromInput(input)
 
-	c, err := p.ParseConsumo()
+	c := p.ParseConsumo()
 
-	if err != nil {
-		tracerr.PrintSourceColor(err)
-		t.FailNow()
-	}
+	checkParserErrors(t, p)
+
+	fmt.Printf("c=%v\n", c)
+}
+
+func TestParseConsumoNoCode(t *testing.T) {
+
+	input := `02/12/22                 Compra con tarjeta de debito                                       -$ 548,00                                $ 166.696,92
+    Autoservicio santa ana - tarj nro. 1866`
+
+	p := FromInput(input)
+
+	c := p.ParseConsumo()
+
+	checkParserErrors(t, p)
+
+	fmt.Printf("c=%v\n", c)
+}
+
+func TestParseConsumoUSD(t *testing.T) {
+
+	input := `16/01/23 1899579                 Compra con tarjeta en el exterior                                                     -U$S 3,49          U$S 1.594,74
+    Google wm max llc - tarj nro. 1866`
+
+	p := FromInput(input)
+
+	c := p.ParseConsumo()
+
 	checkParserErrors(t, p)
 
 	fmt.Printf("c=%v\n", c)
