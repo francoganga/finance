@@ -66,10 +66,22 @@ func (c *loadPdf) Post(ctx echo.Context) error {
 
 			consu := p.ParseConsumo()
 
+			if len(p.Errors()) > 0 {
+
+				msg := ""
+
+				for _, e := range p.Errors() {
+					msg += e
+				}
+
+				return fmt.Errorf("error parsing consumo: %s", msg)
+
+			}
+
 			pd, err := time.Parse("02/01/06", consu.Date)
 
 			if err != nil {
-				return err
+				return fmt.Errorf("error in time.parse consumo: %w", err)
 			}
 
 			t := &models.Transaction{
