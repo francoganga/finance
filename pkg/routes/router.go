@@ -41,9 +41,13 @@ func BuildRouter(c *services.Container) {
 		echomw.Gzip(),
 		echomw.Logger(),
 		middleware.LogRequestID(),
-		echomw.TimeoutWithConfig(echomw.TimeoutConfig{
-			Timeout: c.Config.App.Timeout,
-		}),
+
+        // TODO: I need to disable timeout handler beacause it seems to "wrap" the handlers and
+        // its a problem if something panics there because it does not show what handler panicked
+        // in the stack trace
+		// echomw.TimeoutWithConfig(echomw.TimeoutConfig{
+		// 	Timeout: c.Config.App.Timeout,
+		// }),
 		session.Middleware(sessions.NewCookieStore([]byte(c.Config.App.EncryptionKey))),
 		middleware.LoadAuthenticatedUser(c.Auth),
 		middleware.ServeCachedPage(c.Cache),
