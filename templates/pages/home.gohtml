@@ -8,6 +8,39 @@
     {{- if not (eq .HTMX.Request.Target "posts")}}
         {{template "file-msg" .}}
     {{- end}}
+    <script>
+
+        fetch("/asd").then(r => r.json()).then(data => {
+            if (!data.length) return
+            console.log({data})
+            let opts = {}
+            opts.headings = Object.keys(data[0])
+            opts.data = data.map(item => {
+                let values = []
+
+
+                for (const [key, value] of Object.entries(item)) {
+                    if (key == "Balance" || key == "Amount") {
+                        let intVal = +value
+                        intVal /= 100
+
+                        values.push("$ ".concat(intVal))
+                        continue
+                    }
+                    values.push(value)
+                }
+
+                console.log({values})
+                return values
+                
+            })
+
+            console.log({opts})
+
+            const dt = new window.simpleDatatables.DataTable(".table", {data: opts})
+        })
+
+    </script>
 {{end}}
 
 {{define "top-content"}}
@@ -32,41 +65,7 @@
 
 {{define "posts"}}
     <div id="posts">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Code</th>
-                    <th>Description</th>
-                    <th>Amount</th>
-                    <th>Balance</th>
-                </tr>
-            </thead>
-            <tbody>
-            {{- range .Data}}
-                <tr>
-                    <td>{{.Date.Format "2006-02-01"}}</td>
-                    <td>{{.Code }}</td>
-                    <td>{{.Description}}</td>
-                    <td>{{.Amount}}</td>
-                    <td>{{.Balance}}</td>
-                </tr>
-            {{- end}}
-            </tbody>
-        </table>
-
-        <div class="field is-grouped is-grouped-centered">
-            {{- if not $.Pager.IsBeginning}}
-                <p class="control">
-                    <button class="button is-primary" hx-swap="outerHTML" hx-get="/?page={{sub $.Pager.Page 1}}" hx-target="#posts">Previous page</button>
-                </p>
-            {{- end}}
-            {{- if not $.Pager.IsEnd}}
-                <p class="control">
-                    <button class="button is-primary" hx-swap="outerHTML" hx-get="/?page={{add $.Pager.Page 1}}" hx-target="#posts">Next page</button>
-                </p>
-            {{- end}}
-        </div>
+        <table class="table"></table>
     </div>
 {{end}}
 

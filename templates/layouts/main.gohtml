@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" style="height:100%;">
+<html hx-ext="head-support" lang="en" style="height:100%;">
     <head>
         {{template "metatags" .}}
         {{template "css" .}}
-        {{template "js" .}}
+        {{template "core-js" .}}
     </head>
     <body class="has-background-light" style="min-height:100%;">
         <nav class="navbar is-dark">
@@ -28,6 +28,7 @@
                             <li>{{link (call .ToURL "home") "Dashboard" .Path}}</li>
                             <li>{{link (call .ToURL "about") "About" .Path}}</li>
                             <li>{{link (call .ToURL "contact") "Contact" .Path}}</li>
+                            <li>{{link (call .ToURL "months") "Months" .Path}}</li>
                         </ul>
 
                         <p class="menu-label">Account</p>
@@ -50,7 +51,9 @@
                         {{- end}}
 
                         {{template "messages" .}}
-                        {{template "content" .}}
+                        <div hx-ext="head-support">
+                            {{template "content" .}}
+                        </div>
                     </div>
                 </div>
             </div>

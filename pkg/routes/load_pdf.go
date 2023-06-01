@@ -53,6 +53,7 @@ func (c *loadPdf) Post(ctx echo.Context) error {
 			return err
 		}
 
+        fmt.Printf("%+v\n", file.Filename)
 		for _, line := range matches {
 			fmt.Println(strings.Replace(line, "\n", "\\n", -1))
 		}

@@ -89,6 +89,10 @@ func (c *AuthClient) GetAuthenticatedUserID(ctx echo.Context) (int, error) {
 	}
 
 	if sess.Values[authSessionKeyAuthenticated] == true {
+        if val, ok := sess.Values[authSessionKeyUserID].(int); !ok {
+            return 0, fmt.Errorf("Expected int value, got=%v", val)
+        }
+
 		return sess.Values[authSessionKeyUserID].(int), nil
 	}
 

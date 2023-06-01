@@ -37,11 +37,62 @@ func (c *home) Get(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
-	page.Pager.SetItems(len(transactions))
 
-	page.Data = transactions[page.Pager.GetOffset() : page.Pager.GetOffset()+page.Pager.ItemsPerPage]
 
 	return c.RenderPage(ctx, page)
+}
+
+func (c *home) test(ctx echo.Context) error {
+
+    // transactions := make([]*models.Transaction, 0)
+
+    type Month struct {
+        Month string
+        Year string
+        My string
+    }
+
+    var months []Month;
+
+    page := controller.NewPage(ctx)
+    page.Layout = "main"
+    page.Name = "months"
+
+    err := c.Container.Bun.NewRaw("SELECT DISTINCT EXTRACT(month from date) as month, EXTRACT(year from date) as year, CONCAT(EXTRACT(month from date), ', ', EXTRACT(year from date)) as MY from transactions ORDER BY year ASC, month ASC").Scan(ctx.Request().Context(), &months)
+
+	// err := c.Container.Bun.NewSelect().
+	// 	Model(&transactions).
+	//         Order("date ASC").
+	// 	Scan(ctx.Request().Context())
+
+
+
+
+	if err != nil {
+		return err
+	}
+
+    page.Data = months
+
+    return c.RenderPage(ctx, page)
+}
+
+func (c *home) month(ctx echo.Context) error {
+
+    page := controller.NewPage(ctx)
+    page.Layout = "main"
+    page.Name = "month"
+
+    year := ctx.QueryParam("year")
+    month := ctx.QueryParam("month")
+
+    transactions := make([]*models.Transaction, 0)
+
+    c.Container.Bun.NewRaw("SELECT * FROM transactions WHERE EXTRACT(year from date) = ? AND EXTRACT(month from date) = ?", year, month).Scan(ctx.Request().Context(), &transactions)
+
+    page.Data = transactions
+
+    return c.RenderPage(ctx, page)
 }
 
 // fetchPosts is an mock example of fetching posts to illustrate how paging works

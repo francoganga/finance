@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 )
 
@@ -182,5 +183,50 @@ func TestReadNChar(t *testing.T) {
 
 	if l.position != 4 {
 		t.Fatalf("expected position to be 4, got=%d", l.position)
+	}
+}
+
+func TestRegex1(t *testing.T) {
+
+	input := `Descubierto                                               Traspaso entre cuentas
+Límite: $ 31.000,00             Hasta: 31/05/23           Desactivado
+
+
+
+
+Movimientos en pesos
+                                                                                                    Caja de Ahorro en   Cuenta Corriente en
+           Fecha      Comprobante     Movimiento                                                                                                  Saldo en cuenta
+                                                                                                               pesos                 pesos
+
+
+27/01/23                              Saldo Inicial                                                  $ 407.575,95                   $ 0,00        $ 407.575,95
+
+30/01/23 88945528                     Debito debin                                                     -$ 3.660,00                                $ 403.915,95
+                                      Id debin z0kv8794vp8wml42peydx4 cuit 30703088534
+
+30/01/23              2236282         Compra con tarjeta de debito                                     -$ 1.509,00                                $ 402.406,95
+                                      Pedidosya - tarj nro. 1866
+
+30/01/23              42238514        Compra con tarjeta de debito                                          -$ 50,00                              $ 402.356,95
+    Pedidos ya - propinas - tarj nro. 1866`
+
+	re := regexp.MustCompile(`(?m)^([0-9]{2}/[0-9]{2}/[0-9]{2})\s+([0-9]+)\s+(.*?)\s{2,}(.*?)\s{2,}(.*)\n(.*)`)
+	// re, err := regexp.Compile(`^[0-9]{2}/[0-9]{2}/[0-9]{2}`)
+	// re := regexp.MustCompile(`(?m)^30.*`)
+
+	res := re.FindAllString(input, -1)
+
+	if len(res) == 0 {
+
+		t.Fatalf("len 0")
+
+	}
+
+	fmt.Printf("len=%v\n", len(res))
+
+	for _, m := range res {
+
+		fmt.Printf("m=%v\n", m)
 	}
 }

@@ -13,7 +13,6 @@ type (
 		controller.Controller
 	}
 	aboutData struct {
-
 		ShowCacheWarning bool
 		FrontendTabs     []aboutTab
 		BackendTabs      []aboutTab

@@ -1,0 +1,21 @@
+{{ define "content"}}
+    <section class="hero is-info welcome is-small" style="margin-bottom: 10px">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title">
+                    Months
+                </h1>
+            </div>
+        </div>
+    </section>
+
+<ul>
+    {{ range .Data }}
+    <li style="margin-bottom: 5px">
+        <a href="/month?year={{.Year}}&month={{.Month}}" class="has-text-danger">Mes {{.My}}</a>
+    </li>
+    {{end}}
+</ul>
+
+
+{{end}}

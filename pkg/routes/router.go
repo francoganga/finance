@@ -72,6 +72,8 @@ func BuildRouter(c *services.Container) {
 func navRoutes(c *services.Container, g *echo.Group, ctr controller.Controller) {
 	home := home{Controller: ctr}
 	g.GET("/", home.Get).Name = "home"
+    g.GET("/months", home.test).Name = "months"
+    g.GET("/month", home.month).Name = "month"
 
 	search := search{Controller: ctr}
 	g.GET("/search", search.Get).Name = "search"
