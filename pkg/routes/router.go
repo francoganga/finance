@@ -42,9 +42,9 @@ func BuildRouter(c *services.Container) {
 		echomw.Logger(),
 		middleware.LogRequestID(),
 
-        // TODO: I need to disable timeout handler beacause it seems to "wrap" the handlers and
-        // its a problem if something panics there because it does not show what handler panicked
-        // in the stack trace
+		// TODO: I need to disable timeout handler beacause it seems to "wrap" the handlers and
+		// its a problem if something panics there because it does not show what handler panicked
+		// in the stack trace
 		// echomw.TimeoutWithConfig(echomw.TimeoutConfig{
 		// 	Timeout: c.Config.App.Timeout,
 		// }),
@@ -71,9 +71,15 @@ func BuildRouter(c *services.Container) {
 
 func navRoutes(c *services.Container, g *echo.Group, ctr controller.Controller) {
 	home := home{Controller: ctr}
+	transaction := transaction{Controller: ctr}
+
+	transactionsRoutes := g.Group("/transactions")
+	transactionsRoutes.GET("", transaction.Index)
+	transactionsRoutes.GET("/:id/edit", transaction.Edit)
+
 	g.GET("/", home.Get).Name = "home"
-    g.GET("/months", home.test).Name = "months"
-    g.GET("/month", home.month).Name = "month"
+	g.GET("/months", home.test).Name = "months"
+	g.GET("/month", home.month).Name = "month"
 
 	search := search{Controller: ctr}
 	g.GET("/search", search.Get).Name = "search"

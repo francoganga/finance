@@ -10,4 +10,4 @@ CREATE TABLE category (
 --bun:split
 
 ALTER TABLE transactions
-ADD COLUMN category_id int references category(id);
+ADD COLUMN category_id int references category(id) null;

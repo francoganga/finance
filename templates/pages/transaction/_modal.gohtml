@@ -1,0 +1,28 @@
+{{ define "content" }}
+<div id="modal" class="modal is-active">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header>
+            <div class="modal-card-head">
+                <p class="modal-card-title">Add category to transaction #{{.Data.Transaction.ID}}</p>
+            </div>
+            <section class="modal-card-body">
+                {{.Data.Categories}}
+                <form>
+                    <label class="label" for="category">Category</label>
+                    <div class="select">
+                        <select id="category">
+                            <option>Select...</option>
+                            <option value="1">Mercadopago</option>
+                        </select>
+                    </div>
+                </form>
+            </section>
+            <footer class="modal-card-foot">
+                <button @click="console.log('acepted')" id="btn-save" class="button is-success">Save</button>
+                <button onClick="closeModal()" class="button">Cancel</button>
+            </footer>
+        </header>
+    </div>
+</div>
+{{end}}

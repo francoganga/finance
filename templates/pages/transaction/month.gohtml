@@ -1,0 +1,47 @@
+{{ define "content"}}
+
+    <section>
+        <ul class="list pl0 mt0">
+            {{range .Data}}
+                <li id="li-{{.ID}}" class="flex items-center pa4 bb b--black-10 justify-between">
+                    <div class="flex flex-column">
+                        <a href="#" />
+                            {{.Description}}
+                        </a>
+                        <span class="f6 black-70 mr4">{{.AmountStr}}</span>
+                    </div>
+                    <!-- <button hx-swap="outerHTML" target="li-{{.ID}}" hx-post="/transactions/{{.ID}}" class="button">Category hello</button> -->
+                    <!-- <button @click="open = !open;document.body.classList.add('is-clipped')" id="modal-test" class="button">Category hello</button> -->
+                    <button hx-swap="innerHTML" hx-target="#modal-container" hx-get="/transactions/{{.ID}}/edit" id="modal-test" class="button">Category hello</button>
+                </li>
+            {{end}}
+        </ul>
+
+        <div id="modal-container">
+
+        </div>
+
+    </section>
+
+
+    <script>
+        const closeModal = function() {
+            const modal = document.querySelector("#modal")
+            modal.classList.toggle("is-active")
+        }
+        //document.addEventListener('DOMContentLoaded', () => {
+        //    const btn = document.querySelector("#modal-test")
+        //    const modal = document.querySelector("#modal")
+
+        //    document.querySelector
+
+        //    console.log({btn, modal})
+
+        //    btn.addEventListener('click', evt => {
+        //        modal.classList.toggle("is-active")
+        //    })
+
+
+        //})
+    </script>
+{{end}}

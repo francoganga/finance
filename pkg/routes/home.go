@@ -38,61 +38,66 @@ func (c *home) Get(ctx echo.Context) error {
 		return err
 	}
 
-
 	return c.RenderPage(ctx, page)
 }
 
 func (c *home) test(ctx echo.Context) error {
 
-    // transactions := make([]*models.Transaction, 0)
+	// transactions := make([]*models.Transaction, 0)
 
-    type Month struct {
-        Month string
-        Year string
-        My string
-    }
+	type Month struct {
+		Month string
+		Year  string
+		My    string
+	}
 
-    var months []Month;
+	var months []Month
 
-    page := controller.NewPage(ctx)
-    page.Layout = "main"
-    page.Name = "months"
+	page := controller.NewPage(ctx)
+	page.Layout = "main"
+	page.Name = "transaction/months"
 
-    err := c.Container.Bun.NewRaw("SELECT DISTINCT EXTRACT(month from date) as month, EXTRACT(year from date) as year, CONCAT(EXTRACT(month from date), ', ', EXTRACT(year from date)) as MY from transactions ORDER BY year ASC, month ASC").Scan(ctx.Request().Context(), &months)
+	err := c.Container.Bun.NewRaw("SELECT DISTINCT EXTRACT(month from date) as month, EXTRACT(year from date) as year, CONCAT(EXTRACT(month from date), ', ', EXTRACT(year from date)) as MY from transactions ORDER BY year ASC, month ASC").Scan(ctx.Request().Context(), &months)
 
 	// err := c.Container.Bun.NewSelect().
 	// 	Model(&transactions).
 	//         Order("date ASC").
 	// 	Scan(ctx.Request().Context())
 
-
-
-
 	if err != nil {
 		return err
 	}
 
-    page.Data = months
+	page.Data = months
 
-    return c.RenderPage(ctx, page)
+	return c.RenderPage(ctx, page)
 }
 
 func (c *home) month(ctx echo.Context) error {
 
-    page := controller.NewPage(ctx)
-    page.Layout = "main"
-    page.Name = "month"
+	page := controller.NewPage(ctx)
+	page.Layout = "main"
+	page.Name = "transaction/month"
 
-    year := ctx.QueryParam("year")
-    month := ctx.QueryParam("month")
+	if page.HTMX.Request.Enabled {
+		modal := controller.NewPage(ctx)
+		modal.Name = "transaction/_modal"
+		modal.Layout = "bare"
 
-    transactions := make([]*models.Transaction, 0)
+		return c.RenderPage(ctx, modal)
+	}
+	// fmt.Printf("htmx=%+v\n", page.HTMX)
 
-    c.Container.Bun.NewRaw("SELECT * FROM transactions WHERE EXTRACT(year from date) = ? AND EXTRACT(month from date) = ?", year, month).Scan(ctx.Request().Context(), &transactions)
+	year := ctx.QueryParam("year")
+	month := ctx.QueryParam("month")
 
-    page.Data = transactions
+	transactions := make([]*models.Transaction, 0)
 
-    return c.RenderPage(ctx, page)
+	c.Container.Bun.NewRaw("SELECT * FROM transactions WHERE EXTRACT(year from date) = ? AND EXTRACT(month from date) = ?", year, month).Scan(ctx.Request().Context(), &transactions)
+
+	page.Data = transactions
+
+	return c.RenderPage(ctx, page)
 }
 
 // fetchPosts is an mock example of fetching posts to illustrate how paging works

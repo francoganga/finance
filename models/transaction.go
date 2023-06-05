@@ -19,7 +19,8 @@ type Transaction struct {
 	Description string
 	Amount      int
 	Balance     int
-	Category    Category `bun:"rel:belongs-to"`
+	CategoryID  int
+	Category    *Category `bun:"rel:belongs-to,join:category_id=id"`
 }
 
 func (t *Transaction) AmountStr() string {
